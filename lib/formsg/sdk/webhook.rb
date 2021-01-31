@@ -9,11 +9,13 @@ module Formsg
       def initialize(public_key:, secret_key:)
         @public_key = public_key
         @secret_key = secret_key
-
-        @signing_key = ::Ed25519::SigningKey.from_keypair(Base64.decode64(@secret_key))
       end
 
       def generate_signature(uri:, submission_id:, form_id:, epoch:)
+        unless uri && submission_id && form_id && epoch
+          raise ArgumentError.new("Signature could not be generated for uri=#{uri} submissionId=#{submission_id} formId=#{form_id} epoch=#{epoch}")
+        end
+
         base_string = base_string_with(uri: uri,
                                        submission_id: submission_id,
                                        form_id: form_id,
@@ -42,6 +44,12 @@ module Formsg
 
       private
 
+      def signing_key
+        @signing_key ||= ::Ed25519::SigningKey.from_keypair(Base64.decode64(@secret_key))
+      rescue => e
+        raise WebhookAuthenticateError.new(e.message)
+      end
+
       def base_href(uri)
         URI.parse(uri)&.to_s
       end
@@ -52,12 +60,12 @@ module Formsg
 
       def sign(base_string)
         Base64.encode64(
-          @signing_key.sign(base_string)
+          signing_key.sign(base_string)
         )&.gsub("\n", "")
       end
 
       def verify(base_string, signature)
-        @signing_key.verify_key.verify(
+        signing_key.verify_key.verify(
           Base64.decode64(signature),
           base_string
         )
@@ -69,6 +77,8 @@ module Formsg
         signature_string.split(',')
                         .map{ |kv| kv.split('=') }
                         .to_h
+      rescue => e
+        raise WebhookAuthenticateError.new(e.message)
       end
 
       def signature_header_valid?(uri, signature_header)
@@ -85,7 +95,7 @@ module Formsg
       end
 
       def epoch_expired?(epoch:, expiry: 300000)
-        difference = Time.now.strftime('%s%L').to_i - epoch.to_i
+        difference = (Time.now.strftime('%s%L').to_i - epoch.to_i).abs
         difference > expiry
       end
     end

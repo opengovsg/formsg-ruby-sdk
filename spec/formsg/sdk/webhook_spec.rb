@@ -8,23 +8,52 @@ RSpec.describe Formsg::Sdk::Webhook do
   let(:form_id) { 'someFormId' }
   let(:epoch) { 1583136171649 }
 
-  describe "#initialize" do
-    it "sets the instance variables" do
-      expect(subject.instance_variable_get(:@public_key)).to eq(public_key)
-      expect(subject.instance_variable_get(:@secret_key)).to eq(secret_key)
-    end
-  end
-
   describe "#generate_signature" do
-    it "signs the signature" do
-      signature = subject.generate_signature(
+    let(:generated_signature) do
+      subject.generate_signature(
         uri: uri,
         submission_id: submission_id,
         form_id: form_id,
         epoch: epoch,
       )
+    end
 
-      expect(signature).to eq("KMirkrGJLPqu+Na+gdZLUxl9ZDgf2PnNGPnSoG1FuTMRUTiQ6o0jB/GTj1XFjn2s9JtsL5GiCmYROpjJhDyxCw==")
+    it "signs the signature" do
+      expect(generated_signature).to eq("KMirkrGJLPqu+Na+gdZLUxl9ZDgf2PnNGPnSoG1FuTMRUTiQ6o0jB/GTj1XFjn2s9JtsL5GiCmYROpjJhDyxCw==")
+    end
+
+    context "invalid when" do
+      describe "called with undefined uri" do
+        let(:uri) { nil }
+
+        specify do
+          expect{ generated_signature }.to raise_error(ArgumentError)
+        end
+      end
+
+      describe "called with undefined submissionId" do
+        let(:submission_id) { nil }
+
+        specify do
+          expect{ generated_signature }.to raise_error(ArgumentError)
+        end
+      end
+
+      describe "called with undefined formId" do
+        let(:form_id) { nil }
+
+        specify do
+          expect{ generated_signature }.to raise_error(ArgumentError)
+        end
+      end
+
+      describe "called with undefined epoch" do
+        let(:epoch) { nil }
+
+        specify do
+          expect{ generated_signature }.to raise_error(ArgumentError)
+        end
+      end
     end
   end
 
@@ -67,11 +96,37 @@ RSpec.describe Formsg::Sdk::Webhook do
       end
     end
 
-    describe "should reject signatures generated more than 5 minutes ago" do
-      let(:epoch) { Time.now.strftime('%s%L').to_i - 5 * 60 * 1000 - 1 }
+    context "invalid" do
+      describe "reject signatures generated more than 5 minutes ago" do
+        let(:epoch) { Time.now.strftime('%s%L').to_i - 5 * 60 * 1000 - 1 }
 
-      specify do
-        expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+        specify do
+          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+        end
+      end
+
+      describe "reject invalid signature headers" do
+        let(:header) { "invalidHeader" }
+
+        specify do
+          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+        end
+      end
+
+      describe "reject if signature header cannot be verified" do
+        subject { Formsg::Sdk::Webhook.new(public_key: public_key, secret_key: 'bad_secret') }
+
+        specify do
+          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+        end
+      end
+
+      describe "reject signatures generated more than 5 minutes in the future" do
+        let(:epoch) { Time.now.strftime('%s%L').to_i + 5 * 60 * 1000 + 1000 }
+
+        specify do
+          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+        end
       end
     end
   end
