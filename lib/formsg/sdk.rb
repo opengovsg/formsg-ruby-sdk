@@ -1,8 +1,8 @@
 require "formsg/sdk/version"
+require "formsg/sdk/webhook"
 
 module Formsg
   module Sdk
     class Error < StandardError; end
-    # Your code goes here...
   end
 end
