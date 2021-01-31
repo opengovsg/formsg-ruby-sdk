@@ -2,12 +2,15 @@ PATH
   remote: .
   specs:
     formsg-sdk (0.1.0)
+      ed25519
       rbnacl
 
 GEM
   remote: https://rubygems.org/
   specs:
+    byebug (11.0.1)
     diff-lcs (1.4.4)
+    ed25519 (1.2.4)
     ffi (1.14.2)
     rake (13.0.3)
     rbnacl (7.1.1)
@@ -31,6 +34,7 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.17)
+  byebug
   formsg-sdk!
   rake (~> 13.0)
   rspec (~> 3.0)
