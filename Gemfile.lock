@@ -2,12 +2,16 @@ PATH
   remote: .
   specs:
     formsg-sdk (0.1.0)
+      rbnacl
 
 GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.4.4)
+    ffi (1.14.2)
     rake (10.5.0)
+    rbnacl (7.1.1)
+      ffi
     rspec (3.10.0)
       rspec-core (~> 3.10.0)
       rspec-expectations (~> 3.10.0)
