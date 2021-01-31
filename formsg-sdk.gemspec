@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Michael Cheng"]
   spec.email         = ["michael_cheng@tech.gov.sg"]
 
-  spec.summary       = %q{TODO: Write a short summary, because RubyGems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = "Ruby SDK for integrating with form.gov.sg webhooks"
+  spec.description   = "Ruby SDK for integrating with form.gov.sg webhooks"
+  spec.homepage      = "https://github.com/opengovsg/formsg-ruby-sdk"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
