@@ -1,3 +1,4 @@
+require "rbnacl"
 require "ed25519"
 require "formsg/sdk/version"
 require "formsg/sdk/webhook"
