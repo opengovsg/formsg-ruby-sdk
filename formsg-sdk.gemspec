@@ -44,4 +44,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency "sinatra"
+  spec.add_development_dependency "dotenv"
 end

@@ -9,7 +9,13 @@ GEM
   specs:
     byebug (11.0.1)
     diff-lcs (1.4.4)
+    dotenv (2.7.6)
     ffi (1.14.2)
+    mustermann (1.1.1)
+      ruby2_keywords (~> 0.0.1)
+    rack (2.2.3)
+    rack-protection (2.1.0)
+      rack
     rake (13.0.3)
     rbnacl (7.1.1)
       ffi
@@ -26,6 +32,13 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
+    ruby2_keywords (0.0.4)
+    sinatra (2.1.0)
+      mustermann (~> 1.0)
+      rack (~> 2.2)
+      rack-protection (= 2.1.0)
+      tilt (~> 2.0)
+    tilt (2.0.8)
 
 PLATFORMS
   ruby
@@ -33,9 +46,11 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.17)
   byebug
+  dotenv
   formsg-sdk!
   rake (~> 13.0)
   rspec (~> 3.0)
+  sinatra
 
 BUNDLED WITH
    1.17.3
