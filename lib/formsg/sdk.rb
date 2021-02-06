@@ -2,6 +2,7 @@ require "rbnacl"
 require "formsg/sdk/version"
 require "formsg/sdk/auth_header"
 require "formsg/sdk/webhook"
+require "formsg/sdk/crypto"
 
 module Formsg
   module Sdk
