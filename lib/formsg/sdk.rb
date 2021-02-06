@@ -1,6 +1,7 @@
 require "rbnacl"
 require "ed25519"
 require "formsg/sdk/version"
+require "formsg/sdk/auth_header"
 require "formsg/sdk/webhook"
 
 module Formsg

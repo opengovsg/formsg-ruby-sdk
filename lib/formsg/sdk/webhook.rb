@@ -4,8 +4,6 @@ require "base64"
 module Formsg
   module Sdk
     class Webhook
-      SIGNATURE_KEYS = %w[v1 t s f]
-
       def initialize(public_key:, secret_key:)
         @public_key = public_key
         @secret_key = secret_key
@@ -29,14 +27,14 @@ module Formsg
       end
 
       def authenticate(header_str, uri)
-        signature_header = parse_signature_header(header_str)
+        signature_header = AuthHeader.from_header(header_str)
 
         if !signature_header_valid?(uri, signature_header)
-          raise WebhookAuthenticateError.new("Signature could not be verified for uri=#{uri} submissionId=#{signature_header["s"]} formId=#{signature_header["f"]} epoch=#{signature_header["t"]} signature=#{signature_header["v1"]}")
+          raise WebhookAuthenticateError.new("Signature could not be verified for uri=#{uri} submissionId=#{signature_header.submission_id} formId=#{signature_header.form_id} epoch=#{signature_header.epoch} signature=#{signature_header.signature}")
         end
 
-        if epoch_expired?(epoch: signature_header["t"])
-          raise WebhookAuthenticateError.new("Signature is not recent for uri=#{uri} submissionId=#{signature_header["s"]} formId=#{signature_header["f"]} epoch=#{signature_header["t"]} signature=#{signature_header["v1"]}")
+        if epoch_expired?(epoch: signature_header.epoch)
+          raise WebhookAuthenticateError.new("Signature is not recent for uri=#{uri} submissionId=#{signature_header.submission_id} formId=#{signature_header.form_id} epoch=#{signature_header.epoch} signature=#{signature_header.signature}")
         end
 
         true
@@ -71,27 +69,15 @@ module Formsg
         )
       end
 
-      def parse_signature_header(signature_string)
-        return if signature_string.nil? || signature_string.empty?
-
-        signature_string.split(',')
-                        .map{ |kv| kv.split('=') }
-                        .to_h
-      rescue => e
-        raise WebhookAuthenticateError.new(e.message)
-      end
-
       def signature_header_valid?(uri, signature_header)
-        if signature_header.keys.sort != SIGNATURE_KEYS.sort
-          raise WebhookAuthenticateError.new("X-FormSG-Signature header is invalid")
-        end
+        raise WebhookAuthenticateError.new("X-FormSG-Signature header is invalid") unless signature_header.valid?
 
         base_string = base_string_with(uri: uri,
-                         submission_id: signature_header["s"],
-                         form_id: signature_header["f"],
-                         epoch: signature_header["t"])
+                         submission_id: signature_header.submission_id,
+                         form_id: signature_header.form_id,
+                         epoch: signature_header.epoch)
 
-        verify(base_string, signature_header["v1"])
+        verify(base_string, signature_header.signature)
       end
 
       def epoch_expired?(epoch:, expiry: 300000)
