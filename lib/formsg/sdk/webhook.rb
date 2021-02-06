@@ -43,7 +43,13 @@ module Formsg
       private
 
       def signing_key
-        @signing_key ||= ::Ed25519::SigningKey.from_keypair(Base64.decode64(@secret_key))
+        @signing_key ||= RbNaCl::SigningKey.new(Base64.decode64(@secret_key)[0, 32])
+      rescue => e
+        raise WebhookAuthenticateError.new(e.message)
+      end
+
+      def verify_key
+        @verify_key ||= RbNaCl::VerifyKey.new(Base64.decode64(@secret_key)[32, 32])
       rescue => e
         raise WebhookAuthenticateError.new(e.message)
       end
@@ -63,7 +69,7 @@ module Formsg
       end
 
       def verify(base_string, signature)
-        signing_key.verify_key.verify(
+        verify_key.verify(
           Base64.decode64(signature),
           base_string
         )
