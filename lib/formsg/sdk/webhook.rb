@@ -4,7 +4,7 @@ require "base64"
 module Formsg
   module Sdk
     class Webhook
-      def initialize(public_key:, secret_key:)
+      def initialize(public_key:, secret_key: nil)
         @public_key = public_key
         @secret_key = secret_key
       end
@@ -49,7 +49,7 @@ module Formsg
       end
 
       def verify_key
-        @verify_key ||= RbNaCl::VerifyKey.new(Base64.decode64(@secret_key)[32, 32])
+        @verify_key ||= RbNaCl::VerifyKey.new(Base64.decode64(@public_key)[0, 32])
       rescue => e
         raise WebhookAuthenticateError.new(e.message)
       end
