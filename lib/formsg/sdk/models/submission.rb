@@ -4,23 +4,35 @@ module Formsg
   module Sdk
     module Models
       class Submission
-        attr_reader :form_id, :submission_id, :version, :created_at
-        attr_accessor :responses
+        attr_reader :form_id, :submission_id, :version, :created_at, :responses
+
+        KEY_MAP = {
+          :formId => :form_id,
+          :submissionId => :submission_id,
+          :version => :version,
+          :created => :created_at,
+          :responses => :responses,
+        }
 
         def initialize(options = {})
-          @form_id = options["formId"]
-          @submission_id = options["submissionId"]
-          @version = options["version"]
-          @created_at = ::DateTime.parse(options["created"]) unless options["created"].nil?
-          @responses = options["responses"]
+          KEY_MAP.each do |k,v|
+            instance_variable_set("@#{v}".to_sym, options[k]) unless options[k].nil?
+          end
+
+          @created_at = ::DateTime.parse(@created_at) unless @created_at.nil?
+
+          if !@responses.nil? && @responses&.count > 0
+            @responses = @responses.map do |qn|
+              Question.new(qn)
+            end
+          end
         end
 
-        def self.build_from(data:, crypto: Crypto.new)
-          decrypted_data = crypto.decrypt(data: data)
+        def self.build_from(data:, crypto: Crypto.new, form_secret_key: nil)
+          opts = { data: data }
+          opts[:form_secret_key] = form_secret_key unless form_secret_key.nil?
 
-          data["responses"] = decrypted_data[:responses].map do |qn|
-            Question.new(qn)
-          end
+          data[:responses] = crypto.decrypt(opts).dig(:responses)
 
           new(data)
         end
