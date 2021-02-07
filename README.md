@@ -38,7 +38,9 @@ Or install it yourself as:
     ```ruby
     # apps/controllers/formsg_controller.rb
     
-    class FormsgController <
+    class FormsgController < ApplicationController # You can use ActionController::API to avoid the CSRF token
+      skip_before_action :verify_authenticity_token, :only => [: submissions]
+    
       def submissions
         signature_status = Formsg::Sdk::Webhook.new.authenticate(
                              header: request.headers["HTTP_X_FORMSG_SIGNATURE"]
