@@ -100,8 +100,8 @@ RSpec.describe Formsg::Sdk::Crypto do
   describe "#decrypt" do
     it "decrypts the form data with the form secret key" do
       data = {
-        "encryptedContent" => ciphertext,
-        "version" => internal_test_version
+        encryptedContent: ciphertext,
+        version: internal_test_version
       }
       result = subject.decrypt(form_secret_key: form_secret_key, data: data)
       expect(result[:responses]).to eq plaintext

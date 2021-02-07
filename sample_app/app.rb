@@ -18,15 +18,15 @@ post '/submissions' do
   signature_status = Formsg::Sdk::Webhook.new.authenticate(header: env["HTTP_X_FORMSG_SIGNATURE"])
   if signature_status
     request.body.rewind
-    payload = JSON.parse(request.body.read)
+    payload = JSON.parse(request.body.read, symbolize_names: true)
     logger.info "POST params: #{payload.inspect}"
 
     # Get just the responses as a Hash
-    result_hash = Formsg::Sdk::Crypto.new.decrypt(data: payload["data"])
+    result_hash = Formsg::Sdk::Crypto.new.decrypt(data: payload[:data])
     logger.info "Submission Result (Hash): #{result_hash.inspect}"
 
     # Get the Submission & Responses as an object
-    submission = Formsg::Sdk::Models::Submission.build_from(data: payload["data"])
+    submission = Formsg::Sdk::Models::Submission.build_from(data: payload[:data])
     logger.info "Submission Result (Object): #{submission.inspect}"
   else
     logger.error "Invalid signature"

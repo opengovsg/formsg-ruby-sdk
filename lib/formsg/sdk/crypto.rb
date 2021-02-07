@@ -11,7 +11,7 @@ module Formsg
       end
 
       def decrypt(form_secret_key: Formsg::Sdk.config.default_form_secret_key, data:)
-        decrypted_content = decrypt_content(form_secret_key, data['encryptedContent'])
+        decrypted_content = decrypt_content(form_secret_key, data[:encryptedContent])
 
         { responses: ::JSON.parse(decrypted_content, symbolize_names: true) }
       end
