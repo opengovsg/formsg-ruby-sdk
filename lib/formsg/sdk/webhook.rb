@@ -4,9 +4,9 @@ require "base64"
 module Formsg
   module Sdk
     class Webhook
-      def initialize(public_key:, secret_key: nil)
-        @public_key = public_key
-        @secret_key = secret_key
+      def initialize(public_key: nil, secret_key: nil)
+        @public_key = public_key || Formsg::Sdk.config.default_public_key
+        @secret_key = secret_key || Formsg::Sdk.config.default_secret_key
       end
 
       def generate_signature(uri:, submission_id:, form_id:, epoch:)
@@ -26,15 +26,15 @@ module Formsg
         "t=#{epoch},s=#{submission_id},f=#{form_id},v1=#{signature}"
       end
 
-      def authenticate(header_str, uri)
-        signature_header = AuthHeader.from_header(header_str)
+      def authenticate(header:, post_uri: Formsg::Sdk.config.default_post_uri)
+        signature_headers = AuthHeader.from_header(header)
 
-        if !signature_header_valid?(uri, signature_header)
-          raise WebhookAuthenticateError.new("Signature could not be verified for uri=#{uri} submissionId=#{signature_header.submission_id} formId=#{signature_header.form_id} epoch=#{signature_header.epoch} signature=#{signature_header.signature}")
+        if !signature_header_valid?(post_uri, signature_headers)
+          raise WebhookAuthenticateError.new("Signature could not be verified for uri=#{post_uri} submissionId=#{signature_headers.submission_id} formId=#{signature_headers.form_id} epoch=#{signature_headers.epoch} signature=#{signature_headers.signature}")
         end
 
-        if epoch_expired?(epoch: signature_header.epoch)
-          raise WebhookAuthenticateError.new("Signature is not recent for uri=#{uri} submissionId=#{signature_header.submission_id} formId=#{signature_header.form_id} epoch=#{signature_header.epoch} signature=#{signature_header.signature}")
+        if epoch_expired?(epoch: signature_headers.epoch)
+          raise WebhookAuthenticateError.new("Signature is not recent for uri=#{post_uri} submissionId=#{signature_headers.submission_id} formId=#{signature_headers.form_id} epoch=#{signature_headers.epoch} signature=#{signature_headers.signature}")
         end
 
         true

@@ -92,7 +92,7 @@ RSpec.describe Formsg::Sdk::Webhook do
       let(:epoch) { Time.now.strftime('%s%L').to_i }
 
       specify do
-        expect(subject.authenticate(header, uri)).to be_truthy
+        expect(subject.authenticate(header: header, post_uri: uri)).to be_truthy
       end
     end
 
@@ -101,7 +101,7 @@ RSpec.describe Formsg::Sdk::Webhook do
         let(:epoch) { Time.now.strftime('%s%L').to_i - 5 * 60 * 1000 - 1 }
 
         specify do
-          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+          expect{ subject.authenticate(header: header, post_uri: uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
         end
       end
 
@@ -109,7 +109,7 @@ RSpec.describe Formsg::Sdk::Webhook do
         let(:header) { "invalidHeader" }
 
         specify do
-          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+          expect{ subject.authenticate(header: header, post_uri: uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
         end
       end
 
@@ -117,7 +117,7 @@ RSpec.describe Formsg::Sdk::Webhook do
         subject { Formsg::Sdk::Webhook.new(public_key: public_key, secret_key: 'bad_secret') }
 
         specify do
-          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+          expect{ subject.authenticate(header: header, post_uri: uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
         end
       end
 
@@ -125,7 +125,7 @@ RSpec.describe Formsg::Sdk::Webhook do
         let(:epoch) { Time.now.strftime('%s%L').to_i + 5 * 60 * 1000 + 1000 }
 
         specify do
-          expect{ subject.authenticate(header, uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
+          expect{ subject.authenticate(header: header, post_uri: uri) }.to raise_error(Formsg::Sdk::WebhookAuthenticateError)
         end
       end
     end

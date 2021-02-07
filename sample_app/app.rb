@@ -8,18 +8,20 @@ get '/' do
   'Hello world!'
 end
 
-post '/submissions' do
-  webhook = Formsg::Sdk::Webhook.new(public_key: ENV["FORMSG_PUBLIC_KEY"])
+Formsg::Sdk.configure do |config|
+  config.default_public_key = ENV["FORMSG_PUBLIC_KEY"]
+  config.default_form_secret_key = ENV["FORMSG_FORM_SECRET_KEY"]
+  config.default_post_uri = ENV["FORMSG_POST_URI"]
+end
 
-  signature_status = webhook.authenticate(env["HTTP_X_FORMSG_SIGNATURE"], ENV["FORMSG_POST_URI"])
+post '/submissions' do
+  signature_status = Formsg::Sdk::Webhook.new.authenticate(header: env["HTTP_X_FORMSG_SIGNATURE"])
   if signature_status
+    request.body.rewind
     payload = JSON.parse(request.body.read)
     logger.info "POST params: #{payload.inspect}"
 
-    crypto = Formsg::Sdk::Crypto.new(public_signing_key: ENV["FORMSG_PUBLIC_KEY"])
-    result = crypto.decrypt(form_secret_key: ENV["FORMSG_FORM_SECRET_KEY"],
-                   data: payload["data"])
-
+    result = Formsg::Sdk::Crypto.new.decrypt(data: payload["data"])
     logger.info "Submission Result: #{result.inspect}"
   else
     logger.error "Invalid signature"
