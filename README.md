@@ -20,12 +20,14 @@ Or install it yourself as:
 
 ## Usage
 
+### Ruby on Rails
+
 1. Install `libsodium` (<https://github.com/jedisct1/libsodium>) in your hosting server.
 2. In Rails, add this as an initializer:
 
     ```ruby
     # config/initializers/formsg_sdk.rb
-    
+
     Formsg::Sdk.configure do |config|
       config.default_public_key = "3Tt8VduXsjjd4IrpdCd7BAkdZl/vUCstu9UvTX84FWw=" # Production Public Key
       config.default_form_secret_key = "<your form's secret key>"
@@ -33,14 +35,28 @@ Or install it yourself as:
     end
     ```
 
+    _**Note**: You should probably store the tokens as environment variables._
+
+    **Example:**
+
+    ```ruby
+    # config/initializers/formsg_sdk.rb
+
+    Formsg::Sdk.configure do |config|
+      config.default_public_key = ENV["FORMSG_PUBLIC_KEY"]
+      config.default_form_secret_key = ENV["FORMSG_FORM_SECRET_KEY"]
+      config.default_post_uri = ENV["FORMSG_POST_URI"]
+    end
+    ```
+
 3. Add this in your controller method:
 
     ```ruby
     # apps/controllers/formsg_controller.rb
-    
+
     class FormsgController < ApplicationController # You can use ActionController::API to avoid the CSRF token
       skip_before_action :verify_authenticity_token, :only => [: submissions]
-    
+
       def submissions
         signature_status = Formsg::Sdk::Webhook.new.authenticate(
                              header: request.headers["HTTP_X_FORMSG_SIGNATURE"]
@@ -49,14 +65,14 @@ Or install it yourself as:
         if signature_status
           payload = params[:data]
           Rails.logger.info "POST params: #{payload.inspect}"
-    
+
           result = Formsg::Sdk::Crypto.new.decrypt(data: payload)
           Rails.logger.info "Submission Result: #{result.inspect}"
-          
+
           head :ok
         else
           Rails.logger.error "Invalid signature"
-          
+
           head 500
         end
       end
@@ -67,13 +83,19 @@ Or install it yourself as:
 
     ```ruby
     # config/routes.rb
-    
+
     post "/submissions", to: "formsg#submissions"
     ```
 
 5. Deploy your app to your hosting server.
 6. Update your FormSG's Webhook Endpoint URL.
 7. Test by submitting a new form.
+
+### Usage with Sinatra
+
+Refer to the [sample app](./sample_app/) in this repository.
+
+---
 
 ## Development
 
