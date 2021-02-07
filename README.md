@@ -20,8 +20,50 @@ Or install it yourself as:
 
 ## Usage
 
-1. Install `libsodium` (<https://github.com/jedisct1/libsodium>)
+1. Install `libsodium` (<https://github.com/jedisct1/libsodium>) in your hosting server.
+2. In Rails, add this as an initializer:
 
+    ```ruby
+    # config/initializers/formsg_sdk.rb
+    
+    Formsg::Sdk.configure do |config|
+      config.default_public_key = "3Tt8VduXsjjd4IrpdCd7BAkdZl/vUCstu9UvTX84FWw=" # Production Public Key
+      config.default_form_secret_key = "<your form's secret key>"
+      config.default_post_uri = "https://example.com/submission"
+    end
+    ```
+
+3. Add this in your controller method:
+
+    ```ruby
+    # apps/controllers/formsg_controller.rb
+    
+    class FormsgController <
+      def submissions
+        signature_status = Formsg::Sdk::Webhook.new.authenticate(
+                             header: request.headers["HTTP_X_FORMSG_SIGNATURE"]
+                           )
+
+        if signature_status
+          payload = params[:data]
+          Rails.logger.info "POST params: #{payload.inspect}"
+    
+          result = Formsg::Sdk::Crypto.new.decrypt(data: payload)
+          Rails.logger.info "Submission Result: #{result.inspect}"
+          
+          head :ok
+        else
+          Rails.logger.error "Invalid signature"
+          
+          head 500
+        end
+      end
+    end 
+    ```
+
+4. Deploy your app to your hosting server.
+5. Update your FormSG's Webhook Endpoint URL.
+6. Test by submitting a new form.
 
 ## Development
 
