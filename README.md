@@ -63,9 +63,17 @@ Or install it yourself as:
     end 
     ```
 
-4. Deploy your app to your hosting server.
-5. Update your FormSG's Webhook Endpoint URL.
-6. Test by submitting a new form.
+4. Ensure your `routes.rb` has the new controller method.
+
+    ```ruby
+    # config/routes.rb
+    
+    post "/submissions", to: "formsg#submissions"
+    ```
+
+5. Deploy your app to your hosting server.
+6. Update your FormSG's Webhook Endpoint URL.
+7. Test by submitting a new form.
 
 ## Development
 
