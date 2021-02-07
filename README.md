@@ -18,12 +18,15 @@ Or install it yourself as:
 
     $ gem install formsg-sdk
 
+## Pre-Requisite
+
+Your will need to have `libsodium` (<https://github.com/jedisct1/libsodium>) installed in your hosting server. For local development purposes, you can read up more at the installation guide for [RbNaCl](https://github.com/RubyCrypto/rbnacl).
+
 ## Usage
 
 ### Ruby on Rails
 
-1. Install `libsodium` (<https://github.com/jedisct1/libsodium>) in your hosting server.
-2. In Rails, add this as an initializer:
+1. In Rails, add this as an initializer:
 
     ```ruby
     # config/initializers/formsg_sdk.rb
@@ -49,37 +52,45 @@ Or install it yourself as:
     end
     ```
 
-3. Add this in your controller method:
+2. Add this in your controller method:
 
     ```ruby
     # apps/controllers/formsg_controller.rb
 
-    class FormsgController < ApplicationController # You can use ActionController::API to avoid the CSRF token
-      skip_before_action :verify_authenticity_token, :only => [: submissions]
+    class FormsgController < ApplicationController
+      # You can inherit this controller from ActionController::API to avoid the CSRF token
+      skip_before_action :verify_authenticity_token, only: [:submissions]
 
       def submissions
-        signature_status = Formsg::Sdk::Webhook.new.authenticate(
-                             header: request.headers["HTTP_X_FORMSG_SIGNATURE"]
-                           )
+        # Step 1: Verify that this is a valid Webhook request from FormSG
+        Formsg::Sdk::Webhook.new.authenticate(
+          header: request.headers['HTTP_X_FORMSG_SIGNATURE']
+        )
 
-        if signature_status
-          payload = params[:data]
-          Rails.logger.info "POST params: #{payload.inspect}"
+        # Step 2: Read the data param
+        payload = submission_param
+        Rails.logger.info "POST params: #{payload.inspect}"
 
-          result = Formsg::Sdk::Crypto.new.decrypt(data: payload)
-          Rails.logger.info "Submission Result: #{result.inspect}"
+        # Step 3: Decrypt the form submission
+        result = Formsg::Sdk::Crypto.new.decrypt(data: payload)
+        Rails.logger.info "Submission Result: #{result.inspect}"
 
-          head :ok
-        else
-          Rails.logger.error "Invalid signature"
+        head :ok
+      rescue => e
+        Rails.logger.error "Invalid Submission: #{e.message}"
 
-          head 500
-        end
+        head 500
       end
-    end 
+
+      private
+
+      def submission_param
+        params.require(:data)
+      end
+    end
     ```
 
-4. Ensure your `routes.rb` has the new controller method.
+3. Ensure your `routes.rb` has the new controller method.
 
     ```ruby
     # config/routes.rb
@@ -87,11 +98,11 @@ Or install it yourself as:
     post "/submissions", to: "formsg#submissions"
     ```
 
-5. Deploy your app to your hosting server.
-6. Update your FormSG's Webhook Endpoint URL.
-7. Test by submitting a new form.
+4. Deploy your app to your hosting server.
+5. Update your FormSG's Webhook Endpoint URL.
+6. Test by submitting a new form.
 
-### Usage with Sinatra
+### Sinatra
 
 Refer to the [sample app](./sample_app/) in this repository.
 
