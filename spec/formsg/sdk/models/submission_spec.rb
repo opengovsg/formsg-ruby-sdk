@@ -38,7 +38,7 @@ RSpec.describe Formsg::Sdk::Models::Submission do
       expect(submission.created_at).to eq(DateTime.parse("2021-02-07T11:45:43.740Z"))
 
       expect(submission.responses.count).to eq(3)
-      expect(submission.responses.first).to be_a(Formsg::Sdk::Models::Question)
+      expect(submission.responses.first).to be_a(Formsg::Sdk::Models::Response)
 
       first_response = submission.responses.first
       expect(first_response).to be_header
@@ -93,7 +93,7 @@ RSpec.describe Formsg::Sdk::Models::Submission do
       expect(submission.created_at).to eq(DateTime.parse("2021-02-07T11:45:43.740Z"))
 
       expect(submission.responses.count).to eq(3)
-      expect(submission.responses.first).to be_a(Formsg::Sdk::Models::Question)
+      expect(submission.responses.first).to be_a(Formsg::Sdk::Models::Response)
 
       first_response = submission.responses.first
       expect(first_response).to be_header

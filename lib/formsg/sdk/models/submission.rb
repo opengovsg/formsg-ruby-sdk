@@ -23,7 +23,7 @@ module Formsg
 
           if !@responses.nil? && @responses&.count > 0
             @responses = @responses.map do |qn|
-              Question.new(qn)
+              Response.new(qn)
             end
           end
         end

@@ -1,4 +1,4 @@
-RSpec.describe Formsg::Sdk::Models::Question do
+RSpec.describe Formsg::Sdk::Models::Response do
   describe "#initialize" do
     it "builds a text field" do
       response = {
@@ -7,7 +7,7 @@ RSpec.describe Formsg::Sdk::Models::Question do
         fieldType: "email",
         answer: "test@open.gov.sg",
       }
-      result = Formsg::Sdk::Models::Question.new(response)
+      result = Formsg::Sdk::Models::Response.new(response)
 
       expect(result.question).to eq("Email")
       expect(result.field_type).to eq("email")
@@ -22,7 +22,7 @@ RSpec.describe Formsg::Sdk::Models::Question do
         isHeader: true,
         answer: "",
       }
-      result = Formsg::Sdk::Models::Question.new(response)
+      result = Formsg::Sdk::Models::Response.new(response)
 
       expect(result.question).to eq("Header")
       expect(result.field_type).to eq("section")
@@ -36,7 +36,7 @@ RSpec.describe Formsg::Sdk::Models::Question do
         fieldType: "checkbox",
         answerArray: ["Option 2"],
       }
-      result = Formsg::Sdk::Models::Question.new(response)
+      result = Formsg::Sdk::Models::Response.new(response)
 
       expect(result.question).to eq("Checkbox")
       expect(result.field_type).to eq("checkbox")

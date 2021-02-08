@@ -4,7 +4,7 @@ require "formsg/sdk/version"
 require "formsg/sdk/auth_header"
 require "formsg/sdk/webhook"
 require "formsg/sdk/crypto"
-require "formsg/sdk/models/question"
+require "formsg/sdk/models/response"
 require "formsg/sdk/models/submission"
 
 module Formsg

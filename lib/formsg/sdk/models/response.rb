@@ -1,7 +1,7 @@
 module Formsg
   module Sdk
     module Models
-      class Question
+      class Response
         attr_reader :question, :answer, :field_type
 
         KEY_MAP = {
