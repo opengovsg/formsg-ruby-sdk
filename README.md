@@ -73,11 +73,11 @@ Your will need to have `libsodium` (<https://github.com/jedisct1/libsodium>) ins
 
         # Step 3: Decrypt the form submission
         # Get just the responses as a Hash
-        result_hash = Formsg::Sdk::Crypto.new.decrypt(data: payload)
+        result_hash = Formsg::Sdk::Services::SubmissionService.decrypt_for(data: payload)
         Rails.logger.info "Submission Result (Hash): #{result_hash.inspect}"
 
         # Get the Submission & Responses as an object
-        submission = Formsg::Sdk::Models::Submission.build_from(data: payload)
+        submission = Formsg::Sdk::Services::SubmissionService.build_from(data: payload)
         Rails.logger.info "Submission Result (Object): #{submission.inspect}"
 
         head :ok

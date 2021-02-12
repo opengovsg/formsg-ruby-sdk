@@ -27,15 +27,6 @@ module Formsg
             end
           end
         end
-
-        def self.build_from(data:, crypto: Crypto.new, form_secret_key: nil)
-          opts = { data: data }
-          opts[:form_secret_key] = form_secret_key unless form_secret_key.nil?
-
-          data[:responses] = crypto.decrypt(opts).dig(:responses)
-
-          new(data)
-        end
       end
     end
   end
