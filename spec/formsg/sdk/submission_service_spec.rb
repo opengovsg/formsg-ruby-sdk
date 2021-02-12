@@ -1,4 +1,4 @@
-RSpec.describe Formsg::Sdk::Services::SubmissionService do
+RSpec.describe Formsg::Sdk::SubmissionService do
   let(:test_public_key) { "KUY1XT30ar+XreVjsS1w/c3EpDs2oASbF6G3evvaUJM=" }
   let(:form_secret_key){ "H7B0nKJ+E7+naSkQApxGayz1y/lZe4thta4iPp1B+Ns=" }
   let(:internal_test_version) { 1 }
@@ -136,7 +136,7 @@ RSpec.describe Formsg::Sdk::Services::SubmissionService do
           created: "2021-02-07T11:45:43.740Z"
         }
 
-        submission = Formsg::Sdk::Services::SubmissionService.build_from(data: data, crypto: crypto)
+        submission = Formsg::Sdk::SubmissionService.build_from(data: data, crypto: crypto)
 
         expect(submission).to be_a(Formsg::Sdk::Models::Submission)
         expect(submission.form_id).to eq("5fa0e7880ABCD")
@@ -162,7 +162,7 @@ RSpec.describe Formsg::Sdk::Services::SubmissionService do
           created: "2021-02-07T11:45:43.740Z"
         }
 
-        submission = Formsg::Sdk::Services::SubmissionService.build_from(data: data,
+        submission = Formsg::Sdk::SubmissionService.build_from(data: data,
                                                                          public_signing_key: test_public_key,
                                                                          form_secret_key: form_secret_key)
 
@@ -187,7 +187,7 @@ RSpec.describe Formsg::Sdk::Services::SubmissionService do
         encryptedContent: ciphertext,
         version: internal_test_version
       }
-      result = Formsg::Sdk::Services::SubmissionService.decrypt_for(
+      result = Formsg::Sdk::SubmissionService.decrypt_for(
         data: data,
         public_signing_key: test_public_key,
         form_secret_key: form_secret_key
