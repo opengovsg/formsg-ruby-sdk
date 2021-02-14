@@ -111,6 +111,13 @@ Your will need to have `libsodium` (<https://github.com/jedisct1/libsodium>) ins
 
 Refer to the [sample app](./sample_app/) in this repository.
 
+## Public Key
+
+| FormSG environment | Public Key in base64                           |
+| ------------------ | ---------------------------------------------- |
+| production         | 3Tt8VduXsjjd4IrpdCd7BAkdZl/vUCstu9UvTX84FWw= |
+| staging            | rjv41kYqZwcbe3r6ymMEEKQ+Vd+DPuogN+Gzq3lP2Og= |
+
 ---
 
 ## Development
