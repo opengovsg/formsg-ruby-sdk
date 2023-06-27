@@ -2,6 +2,10 @@
 
 Ruby SDK for integrating with form.gov.sg webhooks
 
+Not using Ruby? Check out our sister SDKs:
+- [formsg-javascript-sdk](https://github.com/opengovsg/formsg-javascript-sdk)
+- [formsg-python-sdk](https://github.com/opengovsg/formsg-python-sdk)
+
 ## Installation
 
 Add this line to your application's Gemfile:
